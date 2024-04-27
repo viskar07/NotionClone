@@ -1,0 +1,20 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1713375002955,
+      "tag": "0000_happy_wrecking_crew",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1713637890612,
+      "tag": "0001_shallow_sleepwalker",
+      "breakpoints": true
+    }
+  ]
+}
