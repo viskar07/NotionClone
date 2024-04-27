@@ -162,7 +162,7 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
       const editor = document.createElement('div');
       wrapper.append(editor);
       const Quill = (await import('quill')).default;
-      const QuillCursors = (await import('quill-cursors')).default;
+      const QuillCursors:any = (await import('quill-cursors')).default;
       Quill.register('modules/cursors', QuillCursors);
       const q = new Quill(editor, {
         theme: 'snow',
