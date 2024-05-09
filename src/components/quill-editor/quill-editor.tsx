@@ -2,6 +2,7 @@
 import { useAppState } from '@/lib/providers/state-provider';
 import { File, Folder, workspace } from '@/lib/supabase/supabase.types';
 import React, {
+  RefObject,
   useCallback,
   useEffect,
   useMemo,
@@ -68,6 +69,9 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
   dirType,
   fileId,
 }) => {
+  // for quill editor
+  const containerRef = useRef(null);
+
   const supabase = createClientComponentClient();
   const { state, workspaceId, folderId, dispatch } = useAppState();
   const saveTimerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -154,17 +158,17 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
     return `${workspaceBreadCrumb} ${folderBreadCrumb} ${fileBreadCrumb}`;
   }, [state, pathname, workspaceId]);
 
-  //
-  const wrapperRef = useCallback(async (wrapper: any) => {
-    if (typeof window !== 'undefined') {
-      if (wrapper === null) return;
-      wrapper.innerHTML = '';
-      const editor = document.createElement('div');
-      wrapper.append(editor);
-      const Quill = (await import('quill')).default;
-      const QuillCursors:any = (await import('quill-cursors')).default;
-      Quill.register('modules/cursors', QuillCursors);
-      const q = new Quill(editor, {
+  const wrapperRef = useCallback(async (wrapper:any) => {
+    if (wrapper && typeof window !== 'undefined') { // Ensure both wrapper and window are defined
+       wrapper.innerHTML = ''; // Clear the content of the wrapper
+      const editor = document.createElement('div'); // Create a div element for Quill
+      wrapper.appendChild(editor); // Append the editor to the wrapper
+
+      const Quill = (await import('quill')).default; // Dynamically import Quill
+      const QuillCursors:any = (await import('quill-cursors')).default; // Dynamically import Quill Cursors
+      Quill.register('modules/cursors', QuillCursors); // Register Quill Cursors module
+
+      const q = new Quill(editor, { // Initialize Quill with options
         theme: 'snow',
         modules: {
           toolbar: TOOLBAR_OPTIONS,
@@ -173,9 +177,9 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
           },
         },
       });
-      setQuill(q);
+      setQuill(q); // Set the Quill instance to state
     }
-  }, []);
+  }, []); 
 
   const restoreFileHandler = async () => {
     if (dirType === 'file') {
@@ -283,6 +287,15 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
     }
     setDeletingBanner(false);
   };
+
+
+  useEffect(() => {
+    const { current: container } = containerRef; // Get the DOM element
+  
+    if (container) {
+      wrapperRef(container); // Call wrapperRef with the element
+    }
+  }, [wrapperRef]);
 
   useEffect(() => {
     if (!fileId) return;
@@ -741,8 +754,8 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
         <div
           id="container"
           className="max-w-[800px]"
-          ref={wrapperRef}
-        ></div>
+          ref={containerRef}
+        />
       </div>
     </>
   );
